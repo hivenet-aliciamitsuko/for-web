@@ -295,29 +295,6 @@ export const ServerList = (props: Props) => {
             }
           />
         </a>
-        <Tooltip
-          placement="right"
-          content={() => (
-            <Column>
-              <span>{props.user.username}</span>
-              <Text class="label" size="small">
-                {props.user.presence}
-              </Text>
-            </Column>
-          )}
-          aria={props.user.username}
-        >
-          <a ref={setMenuButton} class={entryContainer()}>
-            <Avatar
-              size={42}
-              src={props.user.avatarURL}
-              holepunch={"bottom-right"}
-              overlay={<UserStatus.Graphic status={props.user.presence} />}
-              interactive
-            />
-          </a>
-          <UserMenu anchor={menuButton} />
-        </Tooltip>
         <For each={props.unreadConversations.slice(0, 9)}>
           {(conversation) => (
             <Tooltip placement="right" content={conversation.displayName}>
@@ -454,6 +431,29 @@ export const ServerList = (props: Props) => {
       <Shadow>
         <div />
       </Shadow>
+      <Tooltip
+        placement="right"
+        content={() => (
+          <Column>
+            <span>{props.user.username}</span>
+            <Text class="label" size="small">
+              {props.user.presence}
+            </Text>
+          </Column>
+        )}
+        aria={props.user.username}
+      >
+        <a ref={setMenuButton} class={entryContainer()}>
+          <Avatar
+            size={42}
+            src={props.user.avatarURL}
+            holepunch={"bottom-right"}
+            overlay={<UserStatus.Graphic status={props.user.presence} />}
+            interactive
+          />
+        </a>
+        <UserMenu anchor={menuButton} />
+      </Tooltip>
       <Tooltip placement="right" content="Settings">
         <a
           class={entryContainer()}
@@ -535,10 +535,13 @@ function ServerEntry(props: {
         <Show when={isInsertionBefore(props.drag, props.server.id)}>
           <div class={railInsertion} />
         </Show>
+        {/* the tooltip's aria label sits on the wrapper, so the link
+            itself would otherwise be announced with no name at all */}
         <a
           draggable="false"
           tabindex="0"
           href={state.layout.getLastActiveServerPath(props.server.id)}
+          aria-label={props.server.name}
         >
           <Avatar
             size={42}
@@ -651,6 +654,7 @@ function FolderEntry(props: {
             role="button"
             tabindex="0"
             aria-expanded={!collapsed()}
+            aria-label={folderName()}
             onClick={() => state.ordering.toggleFolder(props.entry.folder.id)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {

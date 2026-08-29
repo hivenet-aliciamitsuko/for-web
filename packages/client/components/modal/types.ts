@@ -75,6 +75,7 @@ export type Modals =
   | {
       type: "create_channel";
       server: Server;
+      channelType: "Text" | "Voice";
       categoryId?: string;
       cb?: (channel: Channel) => void;
     }
@@ -86,6 +87,10 @@ export type Modals =
       type: "create_role";
       server: Server;
       callback: (id: string) => void;
+    }
+  | {
+      type: "invite_to_server";
+      user: User;
     }
   | {
       type: "create_or_join_server";

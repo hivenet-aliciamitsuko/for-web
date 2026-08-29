@@ -31,7 +31,6 @@ const MAPPED_EMOJI_KEYS = EMOJI_KEYS.values()
   );
 
 const RE_match = /(?<!\p{L}\w)[:@%#][\p{L}\w\-+]*/u;
-const RE_emojiValidFor = /(?<!\p{L}\w):[\p{L}\w\-+]*/u;
 const RE_mentionValidFor = /(?<!\p{L}\w)@[\p{L}\w\-+]*/u;
 const RE_roleValidFor = /(?<!\p{L}\w)@[\p{L}\w\-+]*/u;
 const RE_channelValidFor = /(?<!\p{L}\w)#[\p{L}\w\-+]*/u;
@@ -127,12 +126,21 @@ export function codeMirrorAutoCompleteSource(
     if (!token) return null;
     const normalizedText = token.text.normalize("NFKC");
     switch (normalizedText[0]) {
-      case ":":
+      case ":": {
+        const text = normalizedText.slice(1);
+        const allEmoji = emoji();
+
+        const options = text
+          ? allEmoji.map((option) =>
+              option.label === `:${text}:` ? { ...option, boost: 1 } : option,
+            )
+          : allEmoji;
+
         return {
           from: token.from,
-          options: emoji(),
-          validFor: RE_emojiValidFor,
+          options,
         } as CompletionResult;
+      }
       case "@":
         return {
           from: token.from,
