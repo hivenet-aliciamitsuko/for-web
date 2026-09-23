@@ -9,12 +9,12 @@ import { useState } from "@revolt/state";
 
 import MdBadge from "@material-design-icons/svg/outlined/badge.svg?component-solid";
 import MdDelete from "@material-design-icons/svg/outlined/delete.svg?component-solid";
+import MdEdit from "@material-design-icons/svg/outlined/edit.svg?component-solid";
 import MdGrid3x3 from "@material-design-icons/svg/outlined/grid_3x3.svg?component-solid";
 import MdHeadsetMic from "@material-design-icons/svg/outlined/headset_mic.svg?component-solid";
 import MdLibraryAdd from "@material-design-icons/svg/outlined/library_add.svg?component-solid";
 import MdMarkChatRead from "@material-design-icons/svg/outlined/mark_chat_read.svg?component-solid";
 
-import { Symbol } from "@revolt/ui/components/utils/Symbol";
 import {
   ContextMenu,
   ContextMenuButton,
@@ -124,10 +124,7 @@ export function CategoryContextMenu(props: {
         <ContextMenuButton icon={MdLibraryAdd} onClick={createCategory}>
           <Trans>Create category</Trans>
         </ContextMenuButton>
-        <ContextMenuButton
-          icon={<Symbol size={16}>edit</Symbol>}
-          onClick={editCategoryName}
-        >
+        <ContextMenuButton icon={MdEdit} onClick={editCategoryName}>
           <Trans>Rename category</Trans>
         </ContextMenuButton>
         <ContextMenuButton icon={MdDelete} onClick={deleteCategory} destructive>

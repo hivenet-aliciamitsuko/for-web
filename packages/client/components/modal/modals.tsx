@@ -11,14 +11,12 @@ import { BanNonMemberModal } from "./modals/BanNonMember";
 import { ChangelogModal } from "./modals/Changelog";
 import { ChannelInfoModal } from "./modals/ChannelInfo";
 import { ChannelToggleMatureModal } from "./modals/ChannelToggleMature";
-import { CreateBotModal } from "./modals/CreateBot";
 import { CreateCategoryModal } from "./modals/CreateCategory";
 import { CreateChannelModal } from "./modals/CreateChannel";
 import { CreateGroupModal } from "./modals/CreateGroup";
 import { CreateGroupOrServer } from "./modals/CreateGroupOrServer";
 import { CreateInviteModal } from "./modals/CreateInvite";
 import { CreateOrJoinServerModal } from "./modals/CreateOrJoinServer";
-import { CreateRoleModal } from "./modals/CreateRole";
 import { CreateServerModal } from "./modals/CreateServer";
 import { CreateWebhookModal } from "./modals/CreateWebhook";
 import { CustomStatusModal } from "./modals/CustomStatus";
@@ -28,7 +26,6 @@ import { DeleteChannelModal } from "./modals/DeleteChannel";
 import { DeleteMessageModal } from "./modals/DeleteMessage";
 import { DeleteRoleModal } from "./modals/DeleteRole";
 import { DeleteServerModal } from "./modals/DeleteServer";
-import { EditBotUsernameModal } from "./modals/EditBotUsername";
 import { EditCategoryModal } from "./modals/EditCategory";
 import { EditEmailModal } from "./modals/EditEmail";
 import { EditPasswordModal } from "./modals/EditPassword";
@@ -48,6 +45,7 @@ import { MFARecoveryModal } from "./modals/MFARecovery";
 import { OnboardingModal } from "./modals/Onboarding";
 import { PinMessageModal } from "./modals/PinMessage";
 import { PolicyChangeModal } from "./modals/PolicyChange";
+import { QuickSwitcherModal } from "./modals/QuickSwitcher";
 import { RemoveMemberModal } from "./modals/RemoveMember";
 import { RenameSessionModal } from "./modals/RenameSession";
 import { ReportContentModal } from "./modals/ReportContent";
@@ -55,8 +53,8 @@ import { ResetBotTokenModal } from "./modals/ResetBotToken";
 import { ScreenSharePickerModal } from "./modals/ScreenSharePicker";
 import { ScreenShareSettingsModal } from "./modals/ScreenShareSettings";
 import { ServerIdentityModal } from "./modals/ServerIdentity";
-import { ServerInfoModal } from "./modals/ServerInfo";
 import { SettingsModal } from "./modals/Settings";
+import { ShortcutsModal } from "./modals/Shortcuts";
 import { SignOutSessionsModal } from "./modals/SignOutSessions";
 import { SignedOutModal } from "./modals/SignedOut";
 import { UserProfileModal } from "./modals/UserProfile";
@@ -97,8 +95,6 @@ export function RenderModal(props: ActiveModal & { onClose: () => void }) {
       return <ChannelInfoModal {...modalProps} />;
     case "channel_toggle_mature":
       return <ChannelToggleMatureModal {...modalProps} />;
-    case "create_bot":
-      return <CreateBotModal {...modalProps} />;
     case "create_category":
       return <CreateCategoryModal {...modalProps} />;
     case "create_channel":
@@ -113,8 +109,6 @@ export function RenderModal(props: ActiveModal & { onClose: () => void }) {
       return <CreateGroupOrServer {...modalProps} />;
     case "invite_to_server":
       return <InviteToServerModal {...modalProps} />;
-    case "create_role":
-      return <CreateRoleModal {...modalProps} />;
     case "create_server":
       return <CreateServerModal {...modalProps} />;
     case "create_webhook":
@@ -165,16 +159,18 @@ export function RenderModal(props: ActiveModal & { onClose: () => void }) {
       return <OnboardingModal {...modalProps} />;
     case "policy_change":
       return <PolicyChangeModal {...modalProps} />;
+    case "quick_switcher":
+      return <QuickSwitcherModal {...modalProps} />;
     case "rename_session":
       return <RenameSessionModal {...modalProps} />;
     case "report_content":
       return <ReportContentModal {...modalProps} />;
     case "server_identity":
       return <ServerIdentityModal {...modalProps} />;
-    case "server_info":
-      return <ServerInfoModal {...modalProps} />;
     case "settings":
       return <SettingsModal {...modalProps} />;
+    case "shortcuts":
+      return <ShortcutsModal {...modalProps} />;
     case "signed_out":
       return <SignedOutModal {...modalProps} />;
     case "sign_out_sessions":
@@ -195,8 +191,6 @@ export function RenderModal(props: ActiveModal & { onClose: () => void }) {
       return <RemoveMemberModal {...modalProps} />;
     case "pin_message":
       return <PinMessageModal {...modalProps} />;
-    case "edit_bot_username":
-      return <EditBotUsernameModal {...modalProps} />;
     case "screen_share_settings":
       return <ScreenShareSettingsModal {...modalProps} />;
     case "screen_share_picker":

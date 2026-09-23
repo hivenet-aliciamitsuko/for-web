@@ -1,3 +1,5 @@
+import { Channel } from "stoat.js";
+
 import { styled } from "styled-system/jsx";
 
 /**
@@ -28,3 +30,19 @@ export const SidebarBase = styled("div", {
     },
   },
 });
+
+/**
+ * Mark a channel read instead of opening it, on Alt+click
+ *
+ * Discord's way of clearing a single unread without losing your place in the
+ * conversation you are already reading.
+ * @returns Whether the click was handled and navigation should not happen
+ */
+export function markReadOnAltClick(event: MouseEvent, channel: Channel) {
+  if (!event.altKey) return false;
+
+  event.preventDefault();
+  if (channel.unread) channel.ack();
+
+  return true;
+}

@@ -8,6 +8,9 @@ export const DEFAULT_SEQUENCES: Record<KeybindAction, (string | RegExp)[]> = {
   [KeybindAction.NAVIGATION_CHANNEL_DOWN]: ["Alt", "ArrowDown"],
   [KeybindAction.NAVIGATION_SERVER_UP]: ["Control", "Alt", "ArrowUp"],
   [KeybindAction.NAVIGATION_SERVER_DOWN]: ["Control", "Alt", "ArrowDown"],
+  [KeybindAction.NAVIGATION_QUICK_SWITCHER]: ["Control", "k"],
+  [KeybindAction.CHAT_SEARCH]: ["Control", "f"],
+  [KeybindAction.SHOW_SHORTCUTS]: ["Control", "/"],
   [KeybindAction.CHAT_JUMP_END]: ["Escape"],
   [KeybindAction.CHAT_MARK_SERVER_AS_READ]: ["Shift", "Escape"],
   [KeybindAction.CHAT_FOCUS_COMPOSITION]: [/^[^ ]$/],
@@ -36,6 +39,9 @@ export const DEFAULT_MAC_SEQUENCES: Record<KeybindAction, (string | RegExp)[]> =
       "Alt" /* Command */,
       "ArrowDown",
     ],
+    [KeybindAction.NAVIGATION_QUICK_SWITCHER]: ["Meta", "k"],
+    [KeybindAction.CHAT_SEARCH]: ["Meta", "f"],
+    [KeybindAction.SHOW_SHORTCUTS]: ["Meta", "/"],
     [KeybindAction.CHAT_JUMP_END]: ["Escape"],
     [KeybindAction.CHAT_MARK_SERVER_AS_READ]: ["Shift", "Escape"],
     [KeybindAction.CHAT_FOCUS_COMPOSITION]: [/^[^ ]$/],
@@ -45,3 +51,16 @@ export const DEFAULT_MAC_SEQUENCES: Record<KeybindAction, (string | RegExp)[]> =
     [KeybindAction.CLOSE_FLOATING]: ["Escape"],
     [KeybindAction.CLOSE_SIDEBAR]: ["Escape"],
   };
+
+/**
+ * Sequences that apply on this device
+ *
+ * macOS puts the same shortcuts on Command, so the two tables differ by more
+ * than presentation and the choice has to be made before anything is matched
+ * or displayed.
+ */
+export function platformSequences() {
+  return navigator.platform.startsWith("Mac")
+    ? DEFAULT_MAC_SEQUENCES
+    : DEFAULT_SEQUENCES;
+}

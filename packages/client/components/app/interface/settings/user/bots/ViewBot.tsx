@@ -9,7 +9,6 @@ import {
   Column,
   Form2,
   iconSize,
-  Symbol,
   useSnackbar,
 } from "@revolt/ui";
 
@@ -33,7 +32,7 @@ export function ViewBot(props: { bot: Bot }) {
   // eslint-disable-next-line solid/reactivity
   const profile = createProfileResource(props.bot.user!);
   const instance = useInstance();
-  const { openModal } = useModals();
+  const { openModal, showError } = useModals();
   const snackbar = useSnackbar();
   const { t } = useLingui();
 
@@ -48,6 +47,7 @@ export function ViewBot(props: { bot: Bot }) {
       <UserProfileEditor
         user={props.bot.user!}
         profile={profile.data}
+        usernameEditable
         attach={[
           {
             name: "public",
@@ -55,9 +55,16 @@ export function ViewBot(props: { bot: Bot }) {
           },
         ]}
         onSubmit={(g) => {
-          props.bot.edit({
-            public: (g.controls["public"] as IFormControl<boolean>).value,
-          });
+          const username = g.controls["username"] as IFormControl<string>;
+
+          props.bot
+            .edit({
+              public: (g.controls["public"] as IFormControl<boolean>).value,
+              // only sent once touched, so an unchanged username is never
+              // put back through validation
+              ...(username.isDirty ? { name: username.value.trim() } : {}),
+            })
+            .catch(showError);
         }}
         onReset={(g) => {
           (g.controls["public"] as IFormControl<boolean>).setValue(
@@ -87,16 +94,6 @@ export function ViewBot(props: { bot: Bot }) {
           onClick={() => openModal({ type: "reset_bot_token", bot: props.bot })}
         >
           <Trans>Reset Token</Trans>
-        </CategoryButton>
-        <CategoryButton
-          description={<Trans>Change this bot's username</Trans>}
-          icon={<Symbol size={22}>badge</Symbol>}
-          action="chevron"
-          onClick={() =>
-            openModal({ type: "edit_bot_username", bot: props.bot })
-          }
-        >
-          <Trans>Change Username</Trans>
         </CategoryButton>
         <CategoryButton
           description={

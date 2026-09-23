@@ -6,6 +6,7 @@ import { useInstance } from "@revolt/instance";
 import { useModals } from "@revolt/modal";
 import { useNavigate, useParams } from "@revolt/routing";
 import { Button, iconSize, Row } from "@revolt/ui";
+import { styled } from "styled-system/jsx";
 
 import MdArrowBack from "@material-design-icons/svg/filled/arrow_back.svg?component-solid";
 
@@ -77,6 +78,12 @@ export default function FlowCreate() {
           </Button>
         </Row>
       </Form>
+
+      {/* "Back" goes to the landing page, which is not where someone who
+          already has an account expects to end up */}
+      <SignInInstead href="/login/auth">
+        <Trans>Already have an account? Sign in</Trans>
+      </SignInInstead>
       {import.meta.env.DEV && (
         <div
           style={{
@@ -98,3 +105,15 @@ export default function FlowCreate() {
     </>
   );
 }
+
+const SignInInstead = styled("a", {
+  base: {
+    fontSize: "0.85em",
+    textAlign: "center",
+    color: "var(--md-sys-color-outline)",
+
+    _hover: {
+      color: "var(--md-sys-color-primary)",
+    },
+  },
+});

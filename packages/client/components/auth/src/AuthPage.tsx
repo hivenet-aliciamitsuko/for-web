@@ -12,6 +12,7 @@ import MdDarkMode from "@material-design-icons/svg/filled/dark_mode.svg?componen
 
 import background from "./background.jpg";
 import { FlowBase } from "./flows/Flow";
+import { PendingInvite } from "./flows/PendingInvite";
 import bluesky from "./flows/bluesky.svg";
 
 /**
@@ -146,7 +147,12 @@ export function AuthPage(props: { children: JSX.Element }) {
             <MdDarkMode {...iconSize("24px")} />
           </IconButton>
         </Nav>
-        <FlowBase>{props.children}</FlowBase>
+        <FlowBase>
+          {/* shown across every flow, so the reason for signing up stays on
+              screen from the landing page through to email verification */}
+          <PendingInvite />
+          {props.children}
+        </FlowBase>
         <Nav>
           <NavItems variant="stack">
             <NavItems>

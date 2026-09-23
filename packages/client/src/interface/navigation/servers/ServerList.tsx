@@ -245,6 +245,14 @@ export const ServerList = (props: Props) => {
                 <a
                   href={state.layout.getLastActiveServerPath(entry.item.id)}
                   aria-label={entry.item.name}
+                  onClick={(event) => {
+                    // Alt+click clears the server's unreads without leaving
+                    // the conversation you are currently reading
+                    if (!event.altKey) return;
+
+                    event.preventDefault();
+                    if (entry.item.unread) entry.item.ack();
+                  }}
                 >
                   <Avatar
                     size={42}

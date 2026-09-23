@@ -10,6 +10,10 @@ import {
 
 interface Props<T> {
   type?: string;
+  /**
+   * Class applied to the drop zone wrapper, to lay its items out
+   */
+  class?: string;
   items: Item<T>[];
   disabled?: boolean;
   dragHandles?: boolean;
@@ -93,6 +97,7 @@ export function Draggable<T>(props: Props<T>) {
 
   return (
     <div
+      class={props.class}
       use:dndzone={{
         type: props.type,
         items: containerItems,
