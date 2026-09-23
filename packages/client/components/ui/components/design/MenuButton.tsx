@@ -12,9 +12,9 @@ import { Unreads } from "./Unreads";
 export type Props = {
   /**
    * Button size
-   * @default thin
+   * @default normal
    */
-  readonly size?: "thin" | "normal";
+  readonly size?: "thin" | "compact" | "normal";
 
   /**
    * Button attention
@@ -175,6 +175,10 @@ const base = cva({
     size: {
       normal: {
         height: "42px",
+        gap: "var(--gap-md)",
+      },
+      compact: {
+        height: "36px",
         gap: "var(--gap-md)",
       },
       thin: {

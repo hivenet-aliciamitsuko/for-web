@@ -14,6 +14,14 @@ export interface AutoCompleteSearchSpace {
   members?: ServerMember[];
   channels?: Channel[];
   roles?: ServerRole[];
+
+  /**
+   * Channel being composed in, where there is one
+   *
+   * Carried through so completions can be ranked by what is happening in this
+   * conversation rather than by name alone.
+   */
+  channel?: Channel;
 }
 
 function generateSearchSpaceFrom(
@@ -23,10 +31,15 @@ function generateSearchSpaceFrom(
   if (object instanceof Message) {
     if (object.channel) return generateSearchSpaceFrom(object.channel, client);
   } else if (object instanceof Channel) {
-    if (object.server) return generateSearchSpaceFrom(object.server, client);
+    if (object.server)
+      return {
+        ...generateSearchSpaceFrom(object.server, client),
+        channel: object,
+      };
     if (object.type === "Group" || object.type === "DirectMessage") {
       return {
         users: object.recipients,
+        channel: object,
       };
     }
   } else if (object instanceof Server) {

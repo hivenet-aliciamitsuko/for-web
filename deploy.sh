@@ -27,6 +27,10 @@ unset BASE_PATH PWA_SCOPE
 
 echo "==> build local"
 mise run build:deps
+# `mise build` ne fait que compiler les catalogues : sans extraction prealable,
+# toute chaine ajoutee depuis le dernier extract s'affiche en clair comme son
+# hash lingui (ex. "77Emn0") dans le build de prod.
+mise run lingui
 mise run build
 
 echo "==> envoi vers $HOST"

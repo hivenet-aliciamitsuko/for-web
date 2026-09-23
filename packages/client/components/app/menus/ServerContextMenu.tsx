@@ -7,6 +7,7 @@ import { Server } from "stoat.js";
 
 import { useClient } from "@revolt/client";
 import { useDevice } from "@revolt/common";
+import { Markdown } from "@revolt/markdown";
 import { useModals } from "@revolt/modal";
 import { useState } from "@revolt/state";
 import { Column, Text, Time } from "@revolt/ui";
@@ -30,6 +31,8 @@ import MdDoNotDisturbOn from "@material-symbols/svg-400/outlined/do_not_disturb_
 import MdNotificationSettings from "@material-symbols/svg-400/outlined/notification_settings.svg?component-solid";
 import MdRadioButtonChecked from "@material-symbols/svg-400/outlined/radio_button_checked-fill.svg?component-solid";
 import MdRadioButtonUnchecked from "@material-symbols/svg-400/outlined/radio_button_unchecked.svg?component-solid";
+
+import { styled } from "styled-system/jsx";
 
 import {
   ContextMenu,
@@ -165,6 +168,16 @@ export function ServerContextMenu(props: { server: Server }) {
 
   return (
     <ContextMenu>
+      {/* the only thing the old server-info dialog showed that this menu did
+          not; without it a server's description is reachable nowhere but the
+          settings form used to write it */}
+      <Show when={props.server.description?.trim()}>
+        <Description>
+          <Markdown content={props.server.description!} />
+        </Description>
+        <ContextMenuDivider />
+      </Show>
+
       <Show when={props.server.unread}>
         <ContextMenuButton icon={MdMarkChatRead} onClick={markAsRead}>
           <Trans>Mark as read</Trans>
@@ -377,3 +390,24 @@ export function ServerContextMenu(props: { server: Server }) {
     </ContextMenu>
   );
 }
+
+/**
+ * Server description, shown above the actions
+ *
+ * Clamped: a description is free-form and can run for paragraphs, which would
+ * push every action in this menu off the bottom of the screen.
+ */
+const Description = styled("div", {
+  base: {
+    padding: "var(--gap-sm) var(--gap-md)",
+
+    fontSize: "13px",
+    lineHeight: 1.35,
+    color: "var(--md-sys-color-outline)",
+
+    // panda rejects -webkit-line-clamp (the codebase has it commented out
+    // elsewhere for the same reason), so the height does the clamping
+    maxHeight: "4.05em",
+    overflow: "hidden",
+  },
+});

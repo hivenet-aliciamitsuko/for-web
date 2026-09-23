@@ -30,6 +30,11 @@ const MAPPED_EMOJI_KEYS = EMOJI_KEYS.values()
       }) as Completion,
   );
 
+/**
+ * How far back to look for people who are actually talking
+ */
+const RECENT_SPEAKER_DEPTH = 60;
+
 const RE_match = /(?<!\p{L}\w)[:@%#][\p{L}\w\-+]*/u;
 const RE_mentionValidFor = /(?<!\p{L}\w)@[\p{L}\w\-+]*/u;
 const RE_roleValidFor = /(?<!\p{L}\w)@[\p{L}\w\-+]*/u;
@@ -60,6 +65,32 @@ export function codeMirrorAutoCompleteSource(
     );
   });
 
+  /**
+   * People who have spoken here recently, most recent first
+   *
+   * Without this, mentioning someone in a busy server means typing past four
+   * strangers whose names happen to sort earlier — the completion list ends up
+   * ranked by alphabet rather than by who you are actually talking to.
+   * Message ids are ULIDs, so ordering by id is ordering by time.
+   */
+  const recentSpeakers = createMemo(() => {
+    const channel = searchSpace()?.channel;
+    const ranks = new Map<string, number>();
+    if (!channel) return ranks;
+
+    const recent = client()
+      .messages.filter((message) => message.channelId === channel.id)
+      .sort((a, b) => b.id.localeCompare(a.id))
+      .slice(0, RECENT_SPEAKER_DEPTH);
+
+    for (const message of recent) {
+      const authorId = message.authorId;
+      if (authorId && !ranks.has(authorId)) ranks.set(authorId, ranks.size);
+    }
+
+    return ranks;
+  });
+
   const users = createMemo(() =>
     (
       searchSpace()?.members ??
@@ -74,6 +105,9 @@ export function codeMirrorAutoCompleteSource(
       const displayName = entry.displayName;
       const userName = user.username;
       const id = entry.id;
+      const userId = typeof id === "string" ? id : id.user;
+
+      const rank = recentSpeakers().get(userId);
 
       return {
         type: "user",
@@ -83,8 +117,11 @@ export function codeMirrorAutoCompleteSource(
           displayName !== userName
             ? `${userName}#${user.discriminator}`
             : undefined,
-        apply: `<@${typeof id === "string" ? id : id.user}> `,
+        apply: `<@${userId}> `,
         url: entry.animatedAvatarURL,
+        // stays within the range CodeMirror expects, and decays gently so a
+        // strong name match can still overtake someone who spoke a while ago
+        boost: rank === undefined ? undefined : Math.max(20, 90 - rank * 8),
       };
     }),
   );

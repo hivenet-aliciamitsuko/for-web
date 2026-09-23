@@ -12,9 +12,10 @@ import { ReactiveSet } from "@solid-primitives/set";
 import {
   ACTION_PRIORITY,
   KeybindAction,
+  PREVENT_DEFAULT,
   keybindFilter,
 } from "./keybindActions";
-import { DEFAULT_MAC_SEQUENCES, DEFAULT_SEQUENCES } from "./keybindSequences";
+import { platformSequences } from "./keybindSequences";
 
 type KeybindContext = {
   createKeybind: (keybind: KeybindAction, callback: () => void) => void;
@@ -45,9 +46,7 @@ export function KeybindContext(props: { children: JSXElement }) {
   /**
    * Sequences for use
    */
-  const sequences = navigator.platform.startsWith("Mac")
-    ? DEFAULT_MAC_SEQUENCES
-    : DEFAULT_SEQUENCES;
+  const sequences = platformSequences();
 
   /**
    * Get the currently firing keybind
@@ -116,10 +115,19 @@ export function KeybindContext(props: { children: JSXElement }) {
 
   /**
    * Handle key down event by adding it to active keys
+   *
+   * Sequences the browser also claims have to be cancelled here: the keybind
+   * callbacks themselves run later from an effect, by which point the event is
+   * long past and the address bar already has focus.
    */
   function onKeyDown(event: KeyboardEvent) {
     target = event.target as HTMLElement;
     activeKeys.add(event.key);
+
+    const keybind = firing();
+    if (keybind && PREVENT_DEFAULT.includes(keybind)) {
+      event.preventDefault();
+    }
   }
 
   /**

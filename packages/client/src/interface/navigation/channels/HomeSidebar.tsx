@@ -24,7 +24,7 @@ import {
 } from "@revolt/ui";
 import { Symbol } from "@revolt/ui/components/utils/Symbol";
 
-import { SidebarBase } from "./common";
+import { SidebarBase, markReadOnAltClick } from "./common";
 
 interface Props {
   /**
@@ -297,6 +297,7 @@ function Entry(
     <MenuButton
       {...remote}
       href={`/channel/${local.channel.id}`}
+      onClick={(event: MouseEvent) => markReadOnAltClick(event, local.channel)}
       size="normal"
       alert={
         !local.active &&

@@ -22,6 +22,21 @@ export enum KeybindAction {
   NAVIGATION_SERVER_DOWN = "navigation_server_down",
 
   /**
+   * Open the quick switcher to jump to any conversation
+   */
+  NAVIGATION_QUICK_SWITCHER = "navigation_quick_switcher",
+
+  /**
+   * Show the list of available keyboard shortcuts
+   */
+  SHOW_SHORTCUTS = "show_shortcuts",
+
+  /**
+   * Search within the current channel
+   */
+  CHAT_SEARCH = "chat_search",
+
+  /**
    * Mark channel as read, jump to the end of conversation, and focus composition
    */
   CHAT_JUMP_END = "chat_jump_end",
@@ -75,6 +90,11 @@ export const ACTION_PRIORITY: KeybindAction[] = [
   KeybindAction.CHAT_MARK_SERVER_AS_READ,
   KeybindAction.CHAT_JUMP_END,
 
+  // Global navigation
+  KeybindAction.NAVIGATION_QUICK_SWITCHER,
+  KeybindAction.SHOW_SHORTCUTS,
+  KeybindAction.CHAT_SEARCH,
+
   // Navigation conflicts
   KeybindAction.NAVIGATION_SERVER_UP,
   KeybindAction.NAVIGATION_SERVER_DOWN,
@@ -83,6 +103,19 @@ export const ACTION_PRIORITY: KeybindAction[] = [
 
   // ... all others
   KeybindAction.CHAT_FOCUS_COMPOSITION,
+];
+
+/**
+ * Actions whose sequence is also claimed by the browser
+ *
+ * Ctrl+K opens the address bar in Chrome and the search bar in Firefox, so the
+ * switcher would never see it. Callbacks run later, from an effect, hence this
+ * separate list: the event itself has to be cancelled while it is still live.
+ */
+export const PREVENT_DEFAULT: KeybindAction[] = [
+  KeybindAction.NAVIGATION_QUICK_SWITCHER,
+  KeybindAction.CHAT_SEARCH,
+  KeybindAction.SHOW_SHORTCUTS,
 ];
 
 /**

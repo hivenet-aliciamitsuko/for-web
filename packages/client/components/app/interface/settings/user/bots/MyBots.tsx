@@ -1,6 +1,7 @@
 import { ErrorBoundary, For, Suspense } from "solid-js";
 
 import { Trans } from "@lingui/solid/macro";
+import { useMutation } from "@tanstack/solid-query";
 
 import { useClient } from "@revolt/client";
 import { createOwnBotsResource } from "@revolt/client/resources";
@@ -19,6 +20,15 @@ import MdSmartToy from "@material-design-icons/svg/outlined/smart_toy.svg?compon
 import { useSettingsNavigation } from "../../Settings";
 
 /**
+ * Placeholder username given to a freshly created bot.
+ *
+ * Deliberately not translated: it is written to the server as the bot's real
+ * username, so it must not depend on the creator's locale. It also has to
+ * survive username validation, hence no space in it.
+ */
+const DEFAULT_BOT_USERNAME = "NewBot";
+
+/**
  * View all owned bots
  */
 export function MyBots() {
@@ -35,23 +45,30 @@ export function MyBots() {
  */
 function CreateBot() {
   const client = useClient();
-  const { openModal } = useModals();
+  const { showError } = useModals();
   const { navigate } = useSettingsNavigation();
+
+  /**
+   * Create a bot and open its editor straight away.
+   *
+   * Asking for a username in a modal first added a step for something the
+   * editor already asks for, so the bot is created with a placeholder username
+   * that the editor's own username field is there to replace.
+   */
+  const create = useMutation(() => ({
+    mutationFn: () => client().bots.createBot(DEFAULT_BOT_USERNAME),
+    onSuccess: (created) => navigate(`bots/${created.id}`),
+    onError: showError,
+  }));
 
   return (
     <CategoryButton.Group>
       <CategoryButton
         action="chevron"
         icon={<MdSmartToy {...iconSize(22)} />}
-        onClick={() =>
-          openModal({
-            type: "create_bot",
-            client: client(),
-            onCreate(bot) {
-              navigate(`bots/${bot.id}`);
-            },
-          })
-        }
+        onClick={() => {
+          if (!create.isPending) create.mutate();
+        }}
         description={
           <Trans>
             You agree that your bot is subject to the Acceptable Usage Policy.

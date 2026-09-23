@@ -64,11 +64,6 @@ export type Modals =
       channel: Channel;
     }
   | {
-      type: "create_bot";
-      client: Client;
-      onCreate: (bot: Bot) => void;
-    }
-  | {
       type: "create_category";
       server: Server;
     }
@@ -82,11 +77,6 @@ export type Modals =
   | {
       type: "create_group";
       client: Client;
-    }
-  | {
-      type: "create_role";
-      server: Server;
-      callback: (id: string) => void;
     }
   | {
       type: "invite_to_server";
@@ -219,6 +209,9 @@ export type Modals =
       acknowledge: () => Promise<void>;
     }
   | {
+      type: "quick_switcher";
+    }
+  | {
       type: "rename_session";
       session: Session;
     }
@@ -233,10 +226,6 @@ export type Modals =
       member: ServerMember;
     }
   | {
-      type: "server_info";
-      server: Server;
-    }
-  | {
       type: "invite";
       invite: PublicChannelInvite;
     }
@@ -245,6 +234,9 @@ export type Modals =
       config: keyof typeof SettingsConfigurations;
       // eslint-disable-next-line
       context?: any;
+    }
+  | {
+      type: "shortcuts";
     }
   | {
       type: "signed_out";
@@ -364,10 +356,6 @@ export type Modals =
   | {
       type: "remove_timeout";
       member: ServerMember;
-    }
-  | {
-      type: "edit_bot_username";
-      bot: Bot;
     }
   | {
       type: "edit_emoji";

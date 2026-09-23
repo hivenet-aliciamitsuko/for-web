@@ -1,4 +1,4 @@
-import { Accessor, Match, Setter, Show, Switch } from "solid-js";
+import { Accessor, Match, onCleanup, Setter, Show, Switch } from "solid-js";
 
 import { Trans, useLingui } from "@lingui/solid/macro";
 import { Channel } from "stoat.js";
@@ -7,6 +7,7 @@ import { styled } from "styled-system/jsx";
 
 import { useClient } from "@revolt/client";
 import { useDevice } from "@revolt/common";
+import { Keybind, KeybindAction } from "@revolt/keybinds";
 import { TextWithEmoji } from "@revolt/markdown";
 import { useModals } from "@revolt/modal";
 import { useVoice } from "@revolt/rtc";
@@ -59,6 +60,35 @@ export function ChannelHeader(props: Props) {
   const state = useState();
   const voice = useVoice();
   const { layout } = useDevice();
+
+  /**
+   * Search field, when the layout is wide enough to show one
+   */
+  let searchBox: HTMLInputElement | undefined;
+
+  /**
+   * Wait for a pause in typing before searching
+   *
+   * The field used to commit on `change`, so it only searched once you pressed
+   * Enter or clicked away — typing into it appeared to do nothing at all.
+   */
+  let searchDebounce: ReturnType<typeof setTimeout> | undefined;
+  onCleanup(() => clearTimeout(searchDebounce));
+
+  /**
+   * Run the search for what is currently in the field
+   *
+   * An empty field keeps the panel open on its prompt rather than closing it,
+   * so clearing the query to retype does not pull the field out from under
+   * the cursor. Escape still closes the sidebar.
+   */
+  function search(query: string) {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(
+      () => props.setSidebarState!({ state: "search", query }),
+      300,
+    );
+  }
 
   const searchValue = () => {
     if (!props.sidebarState) return null;
@@ -261,34 +291,45 @@ export function ChannelHeader(props: Props) {
             layout() === "desktop" || props.sidebarState!().state !== "default"
           }
           fallback={
-            <IconButton
-              onPress={() =>
-                props.setSidebarState!({ state: "search", query: "" })
-              }
-              use:floating={{
-                tooltip: {
-                  placement: "bottom",
-                  content: t`Search`,
-                },
-              }}
-            >
-              <Symbol>search</Symbol>
-            </IconButton>
+            <>
+              {/* no field to put the cursor in at this width, so the shortcut
+                  opens the sidebar that carries one */}
+              <Keybind
+                keybind={KeybindAction.CHAT_SEARCH}
+                onPressed={() =>
+                  props.setSidebarState!({ state: "search", query: "" })
+                }
+              />
+              <IconButton
+                onPress={() =>
+                  props.setSidebarState!({ state: "search", query: "" })
+                }
+                use:floating={{
+                  tooltip: {
+                    placement: "bottom",
+                    content: t`Search`,
+                  },
+                }}
+              >
+                <Symbol>search</Symbol>
+              </IconButton>
+            </>
           }
         >
+          {/* selecting rather than only focusing lets a second Ctrl+F start a
+              new search over the previous query, as the browser's own does */}
+          <Keybind
+            keybind={KeybindAction.CHAT_SEARCH}
+            onPressed={() => {
+              searchBox?.focus();
+              searchBox?.select();
+            }}
+          />
           <SearchBox
+            ref={searchBox}
             placeholder="Search messages..."
             value={searchValue()!}
-            onChange={(e) =>
-              e.currentTarget.value
-                ? props.setSidebarState!({
-                    state: "search",
-                    query: e.currentTarget.value,
-                  })
-                : props.setSidebarState!({
-                    state: "default",
-                  })
-            }
+            onInput={(e) => search(e.currentTarget.value)}
           />
         </Show>
       </Show>

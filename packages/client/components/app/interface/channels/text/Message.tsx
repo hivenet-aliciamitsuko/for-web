@@ -34,6 +34,8 @@ import {
   Reactions,
   SystemMessage,
   SystemMessageIcon,
+  Text,
+  Time,
   Tooltip,
   Username,
 } from "@revolt/ui";
@@ -330,11 +332,20 @@ export function Message(props: Props) {
         }
         infoMatch={
           <Match when={props.message.systemMessage}>
-            <SystemMessageIcon
-              systemMessage={props.message.systemMessage!}
-              createdAt={props.message.createdAt}
-              isServer={!!props.message.server}
-            />
+            <div class={systemMessageInfo()}>
+              <div class={systemMessageLayer({ reveal: false })}>
+                <SystemMessageIcon
+                  systemMessage={props.message.systemMessage!}
+                  createdAt={props.message.createdAt}
+                  isServer={!!props.message.server}
+                />
+              </div>
+              <div class={systemMessageLayer({ reveal: true })}>
+                <Text class="body" size="small">
+                  <Time format="time" value={props.message.createdAt} />
+                </Text>
+              </div>
+            </div>
           </Match>
         }
       >
@@ -407,6 +418,60 @@ export function Message(props: Props) {
     </MessageContext>
   );
 }
+
+/**
+ * Info slot of a system message
+ *
+ * The icon and the time are stacked in a single grid cell, so the slot keeps
+ * the icon's width whichever one is showing and the message list never shifts.
+ *
+ * Recipes rather than `styled()` wrappers: wrapping an imported component at
+ * module scope reads it during this module's evaluation, which is a circular
+ * import here and throws before the app can mount.
+ */
+const systemMessageInfo = cva({
+  base: {
+    display: "grid",
+
+    "& > *": {
+      gridArea: "1 / 1",
+    },
+  },
+});
+
+/**
+ * One layer of that slot
+ *
+ * The time takes the icon's place while the row is hovered, the way a grouped
+ * message reveals its own timestamp.
+ */
+const systemMessageLayer = cva({
+  base: {
+    display: "grid",
+    placeItems: "center",
+    transition: "var(--transitions-fast) opacity",
+  },
+  variants: {
+    reveal: {
+      true: {
+        opacity: 0,
+        whiteSpace: "nowrap",
+        color: "var(--md-sys-color-outline)",
+        // the UI font is proportional, so "1" is narrower than "0"
+        fontVariantNumeric: "tabular-nums",
+
+        _groupHover: {
+          opacity: 1,
+        },
+      },
+      false: {
+        _groupHover: {
+          opacity: 0,
+        },
+      },
+    },
+  },
+});
 
 /**
  * New user indicator

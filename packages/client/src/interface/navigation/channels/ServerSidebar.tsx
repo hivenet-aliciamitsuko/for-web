@@ -46,7 +46,7 @@ import MdSettings from "@material-symbols/svg-400/outlined/settings-fill.svg?com
 
 import { ContextMenu, ContextMenuButton } from "@revolt/app/menus/ContextMenu";
 
-import { SidebarBase } from "./common";
+import { SidebarBase, markReadOnAltClick } from "./common";
 import {
   OrderedCategory,
   applyChannelOrdering,
@@ -63,11 +63,6 @@ interface Props {
    * Currently selected channel ID
    */
   channelId: string | undefined;
-
-  /**
-   * Open server information modal
-   */
-  openServerInfo: () => void;
 
   /**
    * Open server settings modal
@@ -234,7 +229,6 @@ export const ServerSidebar = (props: Props) => {
             <ServerInfo
               server={props.server}
               canManageServer={canManageServer()}
-              openServerInfo={props.openServerInfo}
               openServerSettings={props.openServerSettings}
             />
           </Header>
@@ -251,7 +245,6 @@ export const ServerSidebar = (props: Props) => {
             <ServerInfo
               server={props.server}
               canManageServer={canManageServer()}
-              openServerInfo={props.openServerInfo}
               openServerSettings={props.openServerSettings}
             />
           </Header>
@@ -323,14 +316,16 @@ const ChannelList = styled("div", {
  * Server Information
  */
 function ServerInfo(
-  props: Pick<Props, "server" | "openServerInfo" | "openServerSettings"> & {
+  props: Pick<Props, "server" | "openServerSettings"> & {
     canManageServer: boolean;
   },
 ) {
   return (
     <Row align grow minWidth={0}>
       <ServerBadge flags={props.server.flags} />
-      <ServerName onClick={props.openServerInfo}>
+      {/* not interactive: the header already opens its menu on right click,
+          and the gear beside it opens settings */}
+      <ServerName>
         <TextWithEmoji content={props.server.name} />
       </ServerName>
       <Show when={props.canManageServer}>
@@ -350,7 +345,7 @@ function ServerInfo(
 /**
  * Server name
  */
-const ServerName = styled("a", {
+const ServerName = styled("span", {
   base: {
     flexGrow: 1,
     minWidth: 0,
@@ -480,6 +475,7 @@ function Category(
       </Show>
       <Draggable
         dropIndicator
+        class={channelList()}
         type="channels"
         items={channels()}
         onChange={(reorderedIds) => {
@@ -508,6 +504,20 @@ function Category(
     </CategorySection>
   );
 }
+
+/**
+ * Spacing between the channels of a category
+ *
+ * A hair of separation reads better than a solid block of rows; the entries are
+ * `compact` rather than `normal` so the gap does not make the list taller.
+ */
+const channelList = cva({
+  base: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "2px",
+  },
+});
 
 const CategorySection = styled("div", {
   base: {
@@ -652,8 +662,11 @@ function Entry(
     <Column gap="sm">
       <MenuButton
         href={`/server/${props.channel.serverId}/channel/${props.channel.id}`}
+        onClick={(event: MouseEvent) =>
+          markReadOnAltClick(event, props.channel)
+        }
         use:floating={props.menuGenerator(props.channel)}
-        size="normal"
+        size="compact"
         data-unread={props.channel.unread ? "" : undefined}
         data-mentions={props.channel.mentions?.size || undefined}
         alert={alertState()}

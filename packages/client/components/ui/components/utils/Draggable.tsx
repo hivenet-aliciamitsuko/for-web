@@ -9,10 +9,14 @@ import {
   on,
 } from "solid-js";
 
-import { css } from "styled-system/css";
+import { css, cx } from "styled-system/css";
 
 interface Props<T> {
   type?: string;
+  /**
+   * Class applied to the drop zone wrapper, to lay its items out
+   */
+  class?: string;
   items: Item<T>[];
   disabled?: boolean;
   dragHandles?: boolean;
@@ -153,7 +157,7 @@ export function Draggable<T>(props: Props<T>) {
     <div
       ref={zone}
       data-drop-zone
-      class={props.dropIndicator ? dropIndicatorStyles : undefined}
+      class={cx(props.dropIndicator && dropIndicatorStyles, props.class)}
       onPointerDown={onPointerDown}
       use:dndzone={{
         type: props.type,

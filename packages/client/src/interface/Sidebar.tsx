@@ -140,16 +140,6 @@ const Server: Component = () => {
   const server = () => client()!.servers.get(params().serverId!)!;
 
   /**
-   * Open the server information modal
-   */
-  function openServerInfo() {
-    openModal({
-      type: "server_info",
-      server: server(),
-    });
-  }
-
-  /**
    * Open the server settings modal
    */
   function openServerSettings() {
@@ -165,7 +155,6 @@ const Server: Component = () => {
       <ServerSidebar
         server={server()}
         channelId={params().channelId}
-        openServerInfo={openServerInfo}
         openServerSettings={openServerSettings}
         menuGenerator={(target) => ({
           contextMenu: () =>

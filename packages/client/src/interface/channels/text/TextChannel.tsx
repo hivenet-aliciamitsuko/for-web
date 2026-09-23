@@ -97,6 +97,14 @@ export function TextChannel(props: ChannelPageProps) {
 
   const [atEnd, setEnd] = createSignal(true);
 
+  // Remember this channel for the quick switcher
+  createEffect(
+    on(
+      () => props.channel.id,
+      (id) => state.layout.recordChannelVisit(id),
+    ),
+  );
+
   // Store last unread message id
   createEffect(
     on(

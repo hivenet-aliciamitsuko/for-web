@@ -16,6 +16,7 @@ import { Titlebar } from "@revolt/app/interface/desktop/Titlebar";
 import { useClient, useClientLifecycle } from "@revolt/client";
 import { State } from "@revolt/client/Controller";
 import { NotificationsWorker } from "@revolt/client/NotificationsWorker";
+import { Keybind, KeybindAction } from "@revolt/keybinds";
 import { useModals } from "@revolt/modal";
 import { Navigate, useBeforeLeave, useLocation } from "@revolt/routing";
 import { useState } from "@revolt/state";
@@ -31,7 +32,7 @@ import { Sidebar } from "./interface/Sidebar";
 const Interface = (props: { children: JSX.Element }) => {
   const state = useState();
   const client = useClient();
-  const { openModal } = useModals();
+  const { openModal, isOpen } = useModals();
   const { isLoggedIn, lifecycle } = useClientLifecycle();
   const { pathname } = useLocation();
 
@@ -96,6 +97,22 @@ const Interface = (props: { children: JSX.Element }) => {
             <Navigate href="/login" />
           </Match>
           <Match when={lifecycle.loadedOnce()}>
+            {/* mounted here rather than globally so the switcher can assume a
+                client that has finished loading its channels and servers */}
+            <Keybind
+              keybind={KeybindAction.NAVIGATION_QUICK_SWITCHER}
+              onPressed={() => {
+                if (isOpen("quick_switcher")) return;
+                openModal({ type: "quick_switcher" });
+              }}
+            />
+            <Keybind
+              keybind={KeybindAction.SHOW_SHORTCUTS}
+              onPressed={() => {
+                if (isOpen("shortcuts")) return;
+                openModal({ type: "shortcuts" });
+              }}
+            />
             <Layout
               disconnected={isDisconnected()}
               style={{ "flex-grow": 1, "min-height": 0 }}

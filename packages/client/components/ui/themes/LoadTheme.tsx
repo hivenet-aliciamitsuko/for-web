@@ -61,6 +61,15 @@ export function LoadTheme() {
     const cssProps = getCssProps();
     for (const [key, value] of Object.entries(cssProps))
       document.body.style.setProperty(key, value);
+
+    // Tell the browser which way round to draw the controls it owns itself:
+    // date pickers, native scrollbars, form widgets, autofill. Without it it
+    // assumes light whatever our variables say, so a date field's calendar
+    // glyph comes out dark on a dark panel and the picker it opens is white.
+    document.documentElement.style.colorScheme = state.theme.activeTheme
+      .darkMode
+      ? "dark"
+      : "light";
   });
 
   //Set PWA theme color

@@ -19,6 +19,7 @@ import {
 import MdBadge from "@material-design-icons/svg/filled/badge.svg?component-solid";
 
 import { cropProcess } from "@revolt/modal/modals/CropProcess";
+import { css } from "styled-system/css";
 import { useSettingsNavigation } from "../../Settings";
 
 type AttachedControl<T> = {
@@ -30,6 +31,14 @@ interface Props {
   user: User;
   profile?: UserProfile;
   attach?: AttachedControl<unknown>[];
+  /**
+   * Show an inline username field.
+   *
+   * The control always exists so the group keeps a concrete shape; this only
+   * renders it. Persisting it is left to `onSubmit`, since a username is not
+   * editable through the same endpoint as the rest of the profile.
+   */
+  usernameEditable?: boolean;
   onSubmit?: (g: IFormGroup) => void;
   onReset?: (g: IFormGroup) => void;
   children?: (g: IFormGroup) => JSX.Element;
@@ -45,7 +54,7 @@ export function UserProfileEditor(props: Props) {
   /* eslint-disable solid/reactivity */
   const editGroup = createFormGroup({
     displayName: createFormControl(props.user.displayName),
-    // username: createFormControl(props.user.username),
+    username: createFormControl(props.user.username),
     avatar: createFormControl<string | File[] | null>(
       props.user.animatedAvatarURL,
     ),
@@ -85,6 +94,7 @@ export function UserProfileEditor(props: Props) {
 
   function onReset() {
     editGroup.controls.displayName.setValue(props.user.displayName);
+    editGroup.controls.username.setValue(props.user.username);
     editGroup.controls.avatar.setValue(props.user.animatedAvatarURL);
     editGroup.controls.pronouns.setValue(props.user.pronouns || "");
 
@@ -214,6 +224,21 @@ export function UserProfileEditor(props: Props) {
             dialogTitle: t`Crop Banner`,
           })}
         />
+        <Show when={props.usernameEditable}>
+          <Row align>
+            <Form2.TextField
+              minlength={2}
+              maxlength={32}
+              counter
+              name="username"
+              control={editGroup.controls.username}
+              label={t`Username`}
+            />
+            <div class={css({ flexShrink: 0 })}>
+              <Text class="label">#{props.user.discriminator}</Text>
+            </div>
+          </Row>
+        </Show>
         <Form2.TextField
           minlength={2}
           maxlength={32}

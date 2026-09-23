@@ -36,10 +36,10 @@ export function SystemMessageIcon(props: {
   return (
     <Base type={props.systemMessage.type}>
       <Tooltip
-        content={() => <Time format="relative" value={props.createdAt} />}
+        content={() => <Time format="datetime" value={props.createdAt} />}
         aria={
           formatTime(dayjs, {
-            format: "relative",
+            format: "datetime",
             value: props.createdAt,
           }) as string
         }

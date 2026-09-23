@@ -14,6 +14,14 @@ export enum LAYOUT_SECTIONS {
   MATURE = "nsfw",
 }
 
+/**
+ * How many recently opened channels to remember
+ *
+ * Enough to cover the handful you actually move between; past that the list
+ * stops being "recent" and becomes a second, worse channel list.
+ */
+const RECENT_CHANNEL_MEMORY = 20;
+
 export interface TypeLayout {
   /**
    * URL to redirect to after login
@@ -34,6 +42,11 @@ export interface TypeLayout {
    * Current path within an interface
    */
   activePath: Record<TypeLayout["activeInterface"], string>;
+
+  /**
+   * Channels opened recently, most recent first
+   */
+  recentChannels: string[];
 
   /**
    * Open (or closed) sections of the UI
@@ -69,6 +82,7 @@ export class Layout extends AbstractStore<"layout", TypeLayout> {
     return {
       activeInterface: "home",
       activePath: {},
+      recentChannels: [],
       openSections: {},
     };
   }
@@ -85,6 +99,12 @@ export class Layout extends AbstractStore<"layout", TypeLayout> {
 
     if (typeof input.activeInterface === "string") {
       layout.activeInterface = input.activeInterface;
+    }
+
+    if (Array.isArray(input.recentChannels)) {
+      layout.recentChannels = input.recentChannels
+        .filter((id) => typeof id === "string")
+        .slice(0, RECENT_CHANNEL_MEMORY);
     }
 
     if (typeof input.activePath === "object") {
@@ -106,6 +126,44 @@ export class Layout extends AbstractStore<"layout", TypeLayout> {
     }
 
     return layout;
+  }
+
+  /**
+   * Note that a channel was opened
+   *
+   * Nothing else in the app records this: `activePath` keeps a single location
+   * per section, which answers "where was I" but not "where do I keep going".
+   * @param channelId Channel
+   */
+  recordChannelVisit(channelId: string) {
+    const recent = this.get().recentChannels;
+    if (recent[0] === channelId) return;
+
+    this.set(
+      "recentChannels",
+      [channelId, ...recent.filter((id) => id !== channelId)].slice(
+        0,
+        RECENT_CHANNEL_MEMORY,
+      ),
+    );
+  }
+
+  /**
+   * Channels opened recently, most recent first
+   */
+  recentChannels() {
+    return this.get().recentChannels;
+  }
+
+  /**
+   * Read the next redirect path without consuming it
+   *
+   * The authentication screens need to know where the visitor was headed so
+   * they can say so, but they must not clear it: the redirect still has to
+   * happen once the account exists.
+   */
+  peekNextPath() {
+    return this.get().nextPath;
   }
 
   /**

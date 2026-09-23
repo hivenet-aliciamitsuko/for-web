@@ -542,6 +542,14 @@ function ServerEntry(props: {
           tabindex="0"
           href={state.layout.getLastActiveServerPath(props.server.id)}
           aria-label={props.server.name}
+          onClick={(event) => {
+            // Alt+click clears the server's unreads without leaving
+            // the conversation you are currently reading
+            if (!event.altKey) return;
+
+            event.preventDefault();
+            if (props.server.unread) props.server.ack();
+          }}
         >
           <Avatar
             size={42}
