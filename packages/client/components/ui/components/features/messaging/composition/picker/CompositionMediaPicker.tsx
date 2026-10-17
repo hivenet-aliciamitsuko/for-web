@@ -15,6 +15,7 @@ import { Portal } from "solid-js/web";
 import { Motion, Presence } from "solid-motionone";
 
 import { flip, offset, shift } from "@floating-ui/dom";
+import type { Channel } from "stoat.js";
 import { cva } from "styled-system/css";
 import { styled } from "styled-system/jsx";
 
@@ -47,6 +48,11 @@ interface Props {
    * Text replacement
    */
   onTextReplacement: (node: string) => void;
+
+  /**
+   * Channel to pick emoji for
+   */
+  channel?: Channel;
 }
 
 export const CompositionMediaPickerContext = createContext(
@@ -91,6 +97,7 @@ export function CompositionMediaPicker(props: Props) {
               transition={{ duration: 0.2, easing: [0.87, 0, 0.13, 1] }}
             >
               <Picker
+                channel={props.channel}
                 anchor={() => altRef || anchor()}
                 show={show}
                 setShow={setShow}
@@ -106,7 +113,7 @@ export function CompositionMediaPicker(props: Props) {
 }
 
 function Picker(
-  props: Pick<Props, "onMessage" | "onTextReplacement"> & {
+  props: Pick<Props, "onMessage" | "onTextReplacement" | "channel"> & {
     anchor: Accessor<HTMLElement | undefined>;
     show: Accessor<"gif" | "emoji" | undefined>;
     setShow: Setter<"gif" | "emoji" | undefined>;
@@ -166,17 +173,26 @@ function Picker(
     >
       <Container>
         <Row gap="xs" justify class="CompositionButton">
-          <Button
-            groupActive={props.show() === "gif"}
-            onPress={() => props.setShow("gif")}
-            group="connected-start"
+          <Show
+            when={!props.channel || props.channel.havePermission("SendEmbeds")}
           >
-            GIFs
-          </Button>
+            <Button
+              groupActive={props.show() === "gif"}
+              onPress={() => props.setShow("gif")}
+              group="connected-start"
+            >
+              GIFs
+            </Button>
+          </Show>
+
           <Button
             groupActive={props.show() === "emoji"}
             onPress={() => props.setShow("emoji")}
-            group="connected-end"
+            group={
+              !props.channel || props.channel.havePermission("SendEmbeds")
+                ? "connected-end"
+                : undefined
+            }
           >
             Emoji
           </Button>
@@ -187,7 +203,7 @@ function Picker(
             <GifPicker />
           </Match>
           <Match when={props.show() === "emoji"}>
-            <EmojiPicker />
+            <EmojiPicker channel={props.channel} />
           </Match>
         </Switch>
       </Container>

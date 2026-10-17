@@ -18,6 +18,7 @@ import {
 
 import MdBadge from "@material-design-icons/svg/filled/badge.svg?component-solid";
 
+import { useModals } from "@revolt/modal";
 import { cropProcess } from "@revolt/modal/modals/CropProcess";
 import { css } from "styled-system/css";
 import { useSettingsNavigation } from "../../Settings";
@@ -50,6 +51,7 @@ export function UserProfileEditor(props: Props) {
   const queryClient = useQueryClient();
   const instance = useInstance();
   const { navigate } = useSettingsNavigation();
+  const { openModal } = useModals();
 
   /* eslint-disable solid/reactivity */
   const editGroup = createFormGroup({
@@ -205,6 +207,7 @@ export function UserProfileEditor(props: Props) {
           process={cropProcess({
             ratio: 1,
             ratioLabel: t`Square`,
+            openModal,
             allowModeToggle: false,
             dialogTitle: t`Crop Avatar`,
             circularMask: true,
@@ -221,6 +224,7 @@ export function UserProfileEditor(props: Props) {
           process={cropProcess({
             ratio: 232 / 100,
             ratioLabel: t`Banner`,
+            openModal,
             dialogTitle: t`Crop Banner`,
           })}
         />

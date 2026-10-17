@@ -174,7 +174,7 @@ export function Dialog(props: Props) {
                       {(action) => (
                         <Button
                           variant="text"
-                          size="small"
+                          size="sm"
                           onPress={() => {
                             if (action.isDisabled) return;
 

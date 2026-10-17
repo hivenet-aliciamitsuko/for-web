@@ -47,7 +47,11 @@ export class Device {
    * **Warning:** Don't use unless absolutely necessary.
    * Granular feature-detection is preferred when possible.
    */
-  readonly isIOSTouch = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  readonly isIOSTouch =
+    /iphone|ipad|ipod/i.test(window.navigator.userAgent) ||
+    // iPadOS reports itself as a Mac
+    (/macintosh/i.test(window.navigator.userAgent) &&
+      navigator.maxTouchPoints > 1);
 
   /**
    * Whether this device supports touch input.
@@ -64,13 +68,6 @@ export class Device {
   constructor() {
     this.isMobile = isMobileBrowser();
 
-    if (this.isIOSTouch) {
-      // Load a long press event library to replace context menus on IOS touch
-      //@ts-expect-error There are no types for this library.
-      import("long-press-event");
-      document.getElementsByTagName("body")[0].dataset.longPressDelay = "1000";
-    }
-
     const [lo, setLo] = createSignal<Layout>("desktop");
     this.layout = lo;
     this.setLayout = setLo;
@@ -82,7 +79,45 @@ export class Device {
     if (this.isPWA && navigator.virtualKeyboard) {
       navigator.virtualKeyboard.overlaysContent = true;
     }
+
+    if (this.isIOSTouch && window.visualViewport) {
+      this.trackKeyboard(window.visualViewport);
+    }
   }
+
+  /**
+   * Track visible viewport on iOS to adjust layout when on-screen keyboard opens
+   */
+  private trackKeyboard(viewport: VisualViewport) {
+    const update = () => {
+      const keyboardHeight = Math.max(
+        0,
+        document.documentElement.clientHeight -
+          viewport.height -
+          viewport.offsetTop,
+      );
+
+      const style = document.documentElement.style;
+      style.setProperty("--keyboard-inset", `${keyboardHeight}px`);
+
+      // Safari may still pan the visible area down when focusing an input,
+      // so follow it rather than letting the header slide off screen
+      style.setProperty(
+        "--viewport-offset-top",
+        `${Math.max(0, viewport.offsetTop)}px`,
+      );
+    };
+
+    viewport.addEventListener("resize", update);
+    viewport.addEventListener("scroll", update);
+
+    this.untrackKeyboard = () => {
+      viewport.removeEventListener("resize", update);
+      viewport.removeEventListener("scroll", update);
+    };
+  }
+
+  private untrackKeyboard?: () => void;
 
   onLayout = () => {
     this.setLayout(
@@ -96,6 +131,7 @@ export class Device {
 
   destroy = () => {
     this.pMedia.onchange = this.tMedia.onchange = null;
+    this.untrackKeyboard?.();
   };
 
   get isWakeLocked(): boolean {

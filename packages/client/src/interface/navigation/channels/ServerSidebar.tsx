@@ -14,7 +14,7 @@ import type { Channel, Server, ServerFlags } from "stoat.js";
 import { cva } from "styled-system/css";
 import { styled } from "styled-system/jsx";
 
-import { useDevice } from "@revolt/common";
+import { getChannelIcon, useDevice } from "@revolt/common";
 import { KeybindAction, createKeybind } from "@revolt/keybinds";
 import { TextWithEmoji } from "@revolt/markdown";
 import { useModals } from "@revolt/modal";
@@ -673,15 +673,15 @@ function Entry(
         attention={attentionState()}
         icon={
           <>
-            <Switch fallback={<Symbol>grid_3x3</Symbol>}>
-              <Match when={props.channel.isVoice}>
-                <Symbol
-                  color={inCall() ? "var(--md-sys-color-primary)" : undefined}
-                >
-                  headset_mic
-                </Symbol>
-              </Match>
-            </Switch>
+            <Symbol
+              color={
+                props.channel.isVoice && inCall()
+                  ? "var(--md-sys-color-primary)"
+                  : undefined
+              }
+            >
+              {getChannelIcon(props.channel)}
+            </Symbol>
             <Show when={props.channel.icon}>
               <ChannelIcon
                 src={props.channel.iconURL}

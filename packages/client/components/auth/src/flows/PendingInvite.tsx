@@ -31,7 +31,7 @@ export function PendingInvite() {
   const api = useApi();
   const client = useClient();
 
-  const code = createMemo(() => pendingInviteCode(state.layout.peekNextPath()));
+  const code = createMemo(() => pendingInviteCode(state.auth.peekNextPath()));
 
   const [invite] = createResource(code, async (code) => {
     // the invite route is public, which is the whole reason this can be shown
