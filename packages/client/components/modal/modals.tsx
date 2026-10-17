@@ -19,6 +19,7 @@ import { CreateInviteModal } from "./modals/CreateInvite";
 import { CreateOrJoinServerModal } from "./modals/CreateOrJoinServer";
 import { CreateServerModal } from "./modals/CreateServer";
 import { CreateWebhookModal } from "./modals/CreateWebhook";
+import { CropModal } from "./modals/CropProcess";
 import { CustomStatusModal } from "./modals/CustomStatus";
 import { DeleteBotModal } from "./modals/DeleteBot";
 import { DeleteCategoryModal } from "./modals/DeleteCategory";
@@ -61,7 +62,9 @@ import { SettingsModal } from "./modals/Settings";
 import { ShortcutsModal } from "./modals/Shortcuts";
 import { SignOutSessionsModal } from "./modals/SignOutSessions";
 import { SignedOutModal } from "./modals/SignedOut";
+import { SwapUserModal } from "./modals/SwapUser";
 import { TimeoutMemberModal } from "./modals/TimeoutMember";
+import { TransferOwnershipModal } from "./modals/TransferGroup";
 import { UserProfileModal } from "./modals/UserProfile";
 import { UserProfileMutualFriendsModal } from "./modals/UserProfileMutualFriends";
 import { UserProfileMutualGroupsModal } from "./modals/UserProfileMutualGroups";
@@ -210,6 +213,13 @@ export function RenderModal(props: ActiveModal & { onClose: () => void }) {
       return <EditEmojiModal {...modalProps} />;
     case "delete_emoji":
       return <DeleteEmojiModal {...modalProps} />;
+    case "crop":
+      return <CropModal {...modalProps} />;
+    case "swap_user":
+      return <SwapUserModal {...modalProps} />;
+    case "transfer_ownership":
+      return <TransferOwnershipModal {...modalProps} />;
+
     default:
       console.error(
         "Failed to create modal for",

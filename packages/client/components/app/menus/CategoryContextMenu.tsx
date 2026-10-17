@@ -40,7 +40,7 @@ export function CategoryContextMenu(props: {
    */
   function markAsRead() {
     props.category.channels
-      .filter((channel) => channel.unread)
+      .filter((channel) => channel.unread || channel.mentions?.size)
       .forEach((channel) => channel.ack());
   }
 
@@ -93,10 +93,12 @@ export function CategoryContextMenu(props: {
   }
 
   /**
-   * Determine if any channel in category has unread messages
+   * Determine if any channel in category has unread messages or pending mentions
    */
   const hasUnread = () => {
-    return props.category.channels.some((channel) => channel?.unread);
+    return props.category.channels.some(
+      (channel) => channel?.unread || channel?.mentions?.size,
+    );
   };
 
   return (

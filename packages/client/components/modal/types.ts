@@ -5,7 +5,6 @@ import {
   Channel,
   Client,
   Emoji,
-  File,
   ImageEmbed,
   Message,
   MFA,
@@ -17,6 +16,7 @@ import {
   ServerMember,
   ServerRole,
   Session,
+  File as StoatFile,
   User,
   VideoEmbed,
 } from "stoat.js";
@@ -27,6 +27,7 @@ import { ServerFolder } from "@revolt/state/stores/ServerFolders";
 import { ScreenShareQualityName } from "@revolt/state/stores/Voice";
 
 import type { ChangelogResponse } from "./modals/Changelog";
+import { CropProcessOptions } from "./modals/CropProcess";
 
 export type Modals =
   | {
@@ -155,15 +156,13 @@ export type Modals =
     }
   | {
       type: "error2";
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      error: any;
+      error: unknown;
     }
   | {
       type: "image_viewer";
       embed?: ImageEmbed;
       gif?: VideoEmbed;
-      file?: File;
+      file?: StoatFile;
     }
   | {
       type: "join_server";
@@ -224,6 +223,11 @@ export type Modals =
   | {
       type: "server_identity";
       member: ServerMember;
+    }
+  | {
+      type: "transfer_ownership";
+      channel: Channel;
+      user: User;
     }
   | {
       type: "invite";
@@ -364,4 +368,14 @@ export type Modals =
   | {
       type: "delete_emoji";
       emoji: Emoji;
+    }
+  | {
+      type: "crop";
+      options: CropProcessOptions;
+      files: File[];
+      resolve: (files: File[] | null) => void;
+      maxSize: number | undefined;
+    }
+  | {
+      type: "swap_user";
     };

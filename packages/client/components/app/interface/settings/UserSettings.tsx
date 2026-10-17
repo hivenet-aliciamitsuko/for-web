@@ -84,7 +84,7 @@ const Config: SettingsConfiguration<{ server: Server }> = {
 
     switch (id) {
       case "account":
-        return <MyAccount />;
+        return <MyAccount onClose={props.onClose} />;
       case "appearance":
         return <AppearanceMenu />;
       case "advanced":
